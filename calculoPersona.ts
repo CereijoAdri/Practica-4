@@ -31,3 +31,43 @@ function calcularEdadSincrona(fechaNac: Date): number {
 }
 
 const FIXED_TIMEOUT = 5000;
+
+function calcularEdadesConCallbacks(
+    personas: Persona[],
+    callback: (err: Error | null, resultados?: PersonaConEdad[]) => void
+): void {
+    const resultados: PersonaConEdad[] = [];
+    let personasProcesadas = 0;
+
+    if (personas.length === 0) {
+        callback(null, []);
+        return;
+    }
+
+    personas.forEach(persona => {
+        setTimeout(() => {
+            try {
+                const edad = calcularEdadSincrona(persona.fechaNac);
+                resultados.push({ nombre: persona.nombre, edad: edad });
+                personasProcesadas++;
+
+                if (personasProcesadas === personas.length) {
+                    callback(null, resultados);
+                }
+            } catch (error: any) {
+                callback(error);
+            }
+        }, FIXED_TIMEOUT);
+    });
+}
+
+console.log("--- Ejercicio 1: Usando Callbacks ---");
+console.log("Iniciando cálculo con Callbacks...");
+calcularEdadesConCallbacks(personas, (err, resultados) => {
+    if (err) {
+        console.error("Error al calcular edades con callbacks:", err);
+    } else {
+        console.log("Resultados Callbacks:", resultados);
+    }
+});
+console.log("El cálculo con Callbacks ha sido iniciado. Los resultados aparecerán en 5 segundos.");
