@@ -32,29 +32,25 @@ function calcularEdadSincrona(fechaNac: Date): number {
 
 const FIXED_TIMEOUT = 5000;
 
-function calcularEdadesConPromesas(personas: Persona[]): Promise<PersonaConEdad[]> {
-    const promesasDeCalculo = personas.map(persona => {
-        return new Promise<PersonaConEdad>((resolve, reject) => {
-            setTimeout(() => {
-                try {
-                    const edad = calcularEdadSincrona(persona.fechaNac);
-                    resolve({ nombre: persona.nombre, edad: edad });
-                } catch (error) {
-                    reject(error);
-                }
-            }, FIXED_TIMEOUT);
-        });
-    });
-    return Promise.all(promesasDeCalculo);
+async function calcularEdadesConAsyncAwait(personas: Persona[]): Promise<PersonaConEdad[]> {
+    const resultados: PersonaConEdad[] = [];
+
+    for (const persona of personas) {
+        await new Promise(resolve => setTimeout(resolve, FIXED_TIMEOUT));
+        const edad = calcularEdadSincrona(persona.fechaNac);
+        resultados.push({ nombre: persona.nombre, edad: edad });
+    }
+    return resultados;
 }
 
-console.log("\n--- Ejercicio 2: Usando Promesas ---");
-console.log("Iniciando cálculo con Promesas...");
-calcularEdadesConPromesas(personas)
-    .then(resultados => {
-        console.log("Resultados Promesas:", resultados);
-    })
-    .catch(error => {
-        console.error("Error al calcular edades con promesas:", error);
-    });
-console.log("El cálculo con Promesas ha sido iniciado. Los resultados aparecerán en 5 segundos.");
+console.log("\n--- Ejercicio 3: Usando Async/Await ---");
+console.log("Iniciando cálculo con Async/Await...");
+(async () => {
+    try {
+        const resultados = await calcularEdadesConAsyncAwait(personas);
+        console.log("Resultados Async/Await:", resultados);
+    } catch (error) {
+        console.error("Error al calcular edades con async/await:", error);
+    }
+})();
+console.log("El cálculo con Async/Await ha sido iniciado. Los resultados aparecerán en 5 segundos.");
